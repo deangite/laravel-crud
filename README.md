@@ -1,5 +1,6 @@
 ### Introduction
-Laravel crud is a simple package to create CRUD operations creating table migrations.
+Laravel crud is a simple package to create CRUD operations creating table migrations. <br/>
+This is for Laravel 5.2
 
 ### Installation
 1. Get the package using composer `composer require deangite/laravel-crud`
