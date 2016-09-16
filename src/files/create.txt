@@ -1,0 +1,26 @@
+<html>
+<head>
+<title>Create</title>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="row">
+            <h1>Create %%TBSINGULAR%%</h1>
+            <div class="col-md-6">
+                {!! Form::open(array('route' => '%%TBNAME%%.store')) !!}
+                    %%FORMINPUTS%%
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                {!! Form::close() !!}
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

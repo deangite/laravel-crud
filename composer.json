@@ -1,0 +1,13 @@
+{
+    "name": "inveen/laravel-crud",
+    "description": "It creates crud for laravel",
+    "type": "zip",
+    "authors": [
+        {
+            "name": "Dean Gite",
+            "email": "dean.gite@inveen.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
