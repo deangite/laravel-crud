@@ -11,7 +11,7 @@ class LaraCrudCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'inveen:crud';
+    protected $signature = 'laravel:crud';
 
     /**
      * The console command description.
