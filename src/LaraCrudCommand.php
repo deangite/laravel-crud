@@ -72,14 +72,14 @@ class LaraCrudCommand extends Command
         $viewCreate  = file_get_contents(__DIR__.'/files/create.txt');
         $viewEdit    = file_get_contents(__DIR__.'/files/edit.txt');
 
-        $col = '';
+        $col = [];
         foreach($columns as $key => $cs){
             foreach($cs as $c){
-                $col .= '$table->'.$key.'(\''. $c .'\');__';
+                $col[] = '$table->'.$key.'(\''. $c .'\');';
             }
         }
 
-        $cols = str_replace('__', "\n", $col);
+        $cols = implode("\n\t\t\t", $col);
         $tbData = str_replace('__', "\n", $tbData);
 
         $inputs = str_replace('__', "\n", $inputs);
