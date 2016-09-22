@@ -19,11 +19,11 @@ This is for Laravel 5.2
 
 ### Usage
 1. To create migrations, models, controllers and routes, run
-	```
-	php artisan laravel:crud
-	```
+    ```
+    php artisan laravel:crud
+    ```
 2. After creating migration files you can simply run
-	```
-	php artisan migrate
-	```
+    ```
+    php artisan migrate
+    ```
 3. It will create routes based on table name.
