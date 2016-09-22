@@ -9,5 +9,12 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {}
+    "require": {
+        "laravel/laravel": "5.2*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Deangite\\LaravelCrud\\": "src/"
+        }
+    }
 }

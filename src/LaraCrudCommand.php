@@ -1,6 +1,6 @@
 <?php
 
-namespace InveenLaracrud;
+namespace Deangite\LaravelCrud;
 
 use Illuminate\Console\Command;
 
