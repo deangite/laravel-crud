@@ -186,28 +186,28 @@ class LaraCrudCommand extends Command
 
 	public function getUnique()
 	{
-		return ($this->output->confirm('Unique?')) ? '->unique()' : '';
+		return ($this->output->confirm('Unique?', false)) ? '->unique()' : '';
 	}
 
 	public function getUnsigned()
 	{
-		return ($this->output->confirm('Unsigned?')) ? '->unsigned()' : '';
+		return ($this->output->confirm('Unsigned?', false)) ? '->unsigned()' : '';
 	}
 
 	public function getIndex()
 	{
-		return $this->output->confirm('Index?');
+		return $this->output->confirm('Index?', false);
 	}
 
 	public function getDefault()
 	{
-		$default = $this->output->ask('Value default','No');
-		return ($default == 'No') ? 'null' : '\''.$default.'\'';
+		$default = $this->output->ask('Value default','no');
+		return (in_array($default, ['n','no'])) ? 'null' : '\''.$default.'\'';
 	}
 
 	public function getPlaceholder()
 	{
-		$placeholder = $this->output->ask('Placeholder','No');
-		return ($placeholder == 'No') ? '' : ',\'placeholder\' => \''.$placeholder.'\'';
+		$placeholder = $this->output->ask('Placeholder','no');
+		return (in_array($placeholder, ['n','no'])) ? '' : ',\'placeholder\' => \''.$placeholder.'\'';
 	}
 }
