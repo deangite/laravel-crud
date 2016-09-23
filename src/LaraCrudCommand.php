@@ -20,12 +20,6 @@ class LaraCrudCommand extends Command
 	 */
 	protected $description = 'Command description';
 
-	/**
-	 * Create a new command instance.
-	 *
-	 * @return void
-	 */
-
 	public $tableName = '';
 	public $tableNameSingular = '';
 	public $controllerName = '';
@@ -33,7 +27,12 @@ class LaraCrudCommand extends Command
 	public $tbData = [];
 	public $inputs = [];
 	public $cols = [];
-
+	public $relationships = [];
+	/**
+	 * Create a new command instance.
+	 *
+	 * @return void
+	 */
 	public function __construct()
 	{
 		parent::__construct();
@@ -53,14 +52,20 @@ class LaraCrudCommand extends Command
 	 */
 	public function handle()
 	{
-		$this->tableName = $this->output->ask('Enter table name');
+		$this->tableName = $this->getTableName();
 		$this->tableNameSingular = ucfirst(str_singular($this->tableName));
 
 		do {
-			$type = $this->output->choice('Enter column type', ['No','string','email','textarea','integer'], 'No');
-			if ($type == "No") break;
+			$relationship = $this->output->choice('Choice relationships', ['no','HasOne','HasMany','BelongsTo','ManyToMany'], 'no');
+			if ($relationship == "no") break;
+			$this->$relationship();
+		} while ($relationship !== "no");
+
+		do {
+			$type = $this->output->choice('Enter column type', ['no','string','email','textarea','integer'], 'no');
+			if ($type == "no") break;
 			$this->$type();
-		} while ($type !== "No");
+		} while ($type !== "no");
 
 		$this->tbData[] = '<td>'."\n\t\t\t\t\t\t\t\t".'<a href="{{ route(\''. $this->tableName .'.edit\', [$'.str_singular($this->tableName).'->id]) }}">Edit</a>'."\n\t\t\t\t\t\t\t\t".'<a href="{{ route(\''. $this->tableName .'.delete\', [$'.str_singular($this->tableName).'->id]) }}">Delete</a>'."\n\t\t\t\t\t\t\t".'</td>';
 
@@ -75,6 +80,7 @@ class LaraCrudCommand extends Command
 		$this->cols = implode("\n\t\t\t", $this->col);
 		$this->tbData = implode("\n\t\t\t\t\t\t\t", $this->tbData);
 		$this->inputs = implode("\n\t\t\t\t\t", $this->inputs);
+		$this->relationships = implode("\n\n\t", $this->relationships);
 
 		$array = array(
 			'%%CLASSNAME%%',
@@ -85,7 +91,8 @@ class LaraCrudCommand extends Command
 			'%%TBSINGULAR%%',
 			'%%TBDATA%%',
 			'%%FORMINPUTS%%',
-			'%%FILLABLE%%'
+			'%%FILLABLE%%',
+			'%%RELATIONSHIPS%%',
 		);
 
 		$this->controllerName = ucfirst($this->tableName);
@@ -98,7 +105,8 @@ class LaraCrudCommand extends Command
 			str_singular($this->tableName),
 			$this->tbData,
 			$this->inputs,
-			$this->fillable
+			$this->fillable,
+			$this->relationships,
 		);
 
 		$txt = str_replace($array, $arrayReplace, $this->file);
@@ -129,7 +137,7 @@ class LaraCrudCommand extends Command
 
 	public function string()
 	{
-		$name = $this->getNameColumn();
+		$name = $this->getColumnName();
 		$this->tbData[] = '<td>{{ $'.str_singular($this->tableName).'->'.$name.' }}</td>';
 		$this->fillable .= "'{$name}',";
 
@@ -143,7 +151,7 @@ class LaraCrudCommand extends Command
 
 	public function email()
 	{
-		$name = $this->getNameColumn();
+		$name = $this->getColumnName();
 		$this->tbData[] = '<td>{{ $'.str_singular($this->tableName).'->'.$name.' }}</td>';
 		$this->fillable .= "'{$name}',";
 		
@@ -157,7 +165,7 @@ class LaraCrudCommand extends Command
 
 	public function textarea()
 	{
-		$name = $this->getNameColumn();
+		$name = $this->getColumnName();
 		$this->tbData[] = '<td>{{ $'.str_singular($this->tableName).'->'.$name.' }}</td>';
 		$this->fillable .= "'{$name}',";
 		$this->col[] = '$table->text(\''. $name .'\');';
@@ -167,7 +175,7 @@ class LaraCrudCommand extends Command
 
 	public function integer()
 	{
-		$name = $this->getNameColumn();
+		$name = $this->getColumnName();
 		$this->tbData[] = '<td>{{ $'.str_singular($this->tableName).'->'.$name.' }}</td>';
 		$this->fillable .= "'{$name}',";
 		
@@ -179,7 +187,88 @@ class LaraCrudCommand extends Command
 		$this->inputs[] = '{!! Form::number(\''. $name .'\', '.$this->getDefault().', array(\'class\' => \'form-control\''.$this->getPlaceholder().')) !!}<br>';
 	}
 
-	public function getNameColumn()
+	public function HasOne()
+	{
+		$table = $this->getTableName();
+		$primaryKey = 'id';
+		$foreignKey = $this->output->ask('Foreign Key in '.$table.'?',str_singular($this->tableName).'_'.$primaryKey);
+		$this->relationships[] = 'public function '.str_singular($table).'()
+		{
+			return $this->hasOne(\'App\Models\\'.ucfirst(str_singular($table)).'\',\''.$foreignKey.'\',\'id\');
+		}';
+	}
+
+	public function HasMany()
+	{
+		$table = $this->getTableName();
+		$primaryKey = 'id';
+		$foreignKey = $this->output->ask('Foreign Key in '.$table.'?',str_singular($this->tableName).'_'.$primaryKey);
+		$this->relationships[] = 'public function '.$table.'()
+		{
+			return $this->hasMany(\'App\Models\\'.ucfirst(str_singular($table)).'\',\''.$foreignKey.'\',\'id\');
+		}';
+	}
+
+	public function BelongsTo()
+	{
+		$table = $this->getTableName();
+		$primaryKey = 'id';
+		$foreignKey = $this->output->ask('Foreign Key in '.$this->tableName.'?',str_singular($table).'_'.$primaryKey);
+		$this->col[] = '$table->integer(\''. $foreignKey .'\')->unsigned();';
+		$this->col[] = '$table->foreign(\''. $foreignKey .'\')->references(\'id\')->on(\''.$table.'\');';
+		$this->relationships[] = 'public function '.str_singular($table).'()
+		{
+			return $this->belongsTo(\'App\Models\\'.ucfirst(str_singular($table)).'\',\''.$foreignKey.'\',\'id\');
+		}';
+	}
+
+	public function ManyToMany()
+	{
+		$table = $this->getTableName();
+		$primaryKey = 'id';
+		$midleTable = str_singular($this->tableName).'_'.str_singular($table);
+		$midleTable = $this->output->ask('Midle Table Name?',$midleTable);
+		$foreignKey1 = $this->output->ask('Foreign Key 1 in '.$midleTable.'?',str_singular($this->tableName).'_'.$primaryKey);
+		$foreignKey2 = $this->output->ask('Foreign Key 2 in '.$midleTable.'?',str_singular($table).'_'.$primaryKey);
+
+		if (empty(glob(database_path('migrations/[\d_]{17}_create_'.$midleTable.'_table.php')))) {
+			$cols[] = '$table->integer(\''. $foreignKey1 .'\')->unsigned();';
+			$cols[] = '$table->foreign(\''. $foreignKey1 .'\')->references(\'id\')->on(\''.$this->tableName.'\');';
+			$cols[] = '$table->integer(\''. $foreignKey2 .'\')->unsigned();';
+			$cols[] = '$table->foreign(\''. $foreignKey2 .'\')->references(\'id\')->on(\''.$table.'\');';
+			
+			$cols = implode("\n\t\t\t", $cols);
+
+			$array = array(
+				'%%CLASSNAME%%',
+				'%%TBNAME%%',
+				'%%COLUMNS%%',
+			);
+			$classname = array_map('ucfirst', explode('_', $midleTable));
+			$classname = implode('', $classname);
+			$arrayReplace = array(
+				'Create'.$classname.'Table',
+				$midleTable,
+				$cols,
+			);
+
+			$txt = str_replace($array, $arrayReplace, $this->file);
+
+			file_put_contents(database_path('migrations/'.date('Y_m_d_His').'_create_'.$midleTable.'_table.php'), $txt);
+		}
+
+		$this->relationships[] = 'public function '.str_singular($table).'()
+		{
+			return $this->belongsToMany(\'App\Models\\'.ucfirst(str_singular($table)).'\',\''.$midleTable.'\',\''.$foreignKey1.'\',\''.$foreignKey2.'\');
+		}';
+	}
+
+	public function getTableName()
+	{
+		return $this->output->ask('Enter table name');
+	}
+
+	public function getColumnName()
 	{
 		return $this->output->ask('Column name');
 	}

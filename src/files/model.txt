@@ -9,4 +9,6 @@ class %%MODELNAME%% extends Model
 	protected $table = '%%TBNAME%%';
 
 	protected $fillable = [%%FILLABLE%%];
+
+	%%RELATIONSHIPS%%
 }
