@@ -32,8 +32,6 @@ class LaraCrudCommand extends Command
 	public $fillable = '';
 	public $tbData = [];
 	public $inputs = [];
-	public $col = [];
-	public $columns = [];
 	public $cols = [];
 
 	public function __construct()
@@ -58,9 +56,8 @@ class LaraCrudCommand extends Command
 		$this->tableName = $this->output->ask('Enter table name');
 		$this->tableNameSingular = ucfirst(str_singular($this->tableName));
 
-
 		do {
-			$type = $this->output->ask('Enter column type', 'No');
+			$type = $this->output->choice('Enter column type', ['No','string','email','textarea','integer'], 'No');
 			if ($type == "No") break;
 			$this->$type();
 		} while ($type !== "No");
@@ -132,19 +129,85 @@ class LaraCrudCommand extends Command
 
 	public function string()
 	{
-		$name = $this->output->ask('Column name');
-		$this->columns['string'][] = $name;
-		$this->cols[] = $name;
-
-		$this->col[] = '$table->string(\''. $name .'\');';
+		$name = $this->getNameColumn();
 		$this->tbData[] = '<td>{{ $'.str_singular($this->tableName).'->'.$name.' }}</td>';
-		$this->inputs[] = '{!! Form::text(\''. $name .'\', null, array(\'class\' => \'form-control\')) !!}<br>';
 		$this->fillable .= "'{$name}',";
+
+		$this->col[] = '$table->string(\''. $name .'\')'.$this->getUnique().';';
+
+		if($this->getIndex())
+			$this->col[] = '$table->index(\''. $name .'\');';
+
+		$this->inputs[] = '{!! Form::text(\''. $name .'\', '.$this->getDefault().', array(\'class\' => \'form-control\''.$this->getPlaceholder().')) !!}<br>';
 	}
 
-	public function __call($type,$arguments)
+	public function email()
 	{
-		$this->info($type.' is not permited, only: string');
-		return false;
+		$name = $this->getNameColumn();
+		$this->tbData[] = '<td>{{ $'.str_singular($this->tableName).'->'.$name.' }}</td>';
+		$this->fillable .= "'{$name}',";
+		
+		$this->col[] = '$table->string(\''. $name .'\')'.$this->getUnique().';';
+
+		if($this->getIndex())
+			$this->col[] = '$table->index(\''. $name .'\');';
+
+		$this->inputs[] = '{!! Form::email(\''. $name .'\', '.$this->getDefault().', array(\'class\' => \'form-control\''.$this->getPlaceholder().')) !!}<br>';
+	}
+
+	public function textarea()
+	{
+		$name = $this->getNameColumn();
+		$this->tbData[] = '<td>{{ $'.str_singular($this->tableName).'->'.$name.' }}</td>';
+		$this->fillable .= "'{$name}',";
+		$this->col[] = '$table->text(\''. $name .'\');';
+
+		$this->inputs[] = '{!! Form::textarea(\''. $name .'\', '.$this->getDefault().', array(\'class\' => \'form-control\''.$this->getPlaceholder().')) !!}<br>';
+	}
+
+	public function integer()
+	{
+		$name = $this->getNameColumn();
+		$this->tbData[] = '<td>{{ $'.str_singular($this->tableName).'->'.$name.' }}</td>';
+		$this->fillable .= "'{$name}',";
+		
+		$this->col[] = '$table->integer(\''. $name .'\')'.$this->getUnique().$this->getUnsigned().';';
+
+		if($this->getIndex())
+			$this->col[] = '$table->index(\''. $name .'\');';
+
+		$this->inputs[] = '{!! Form::number(\''. $name .'\', '.$this->getDefault().', array(\'class\' => \'form-control\''.$this->getPlaceholder().')) !!}<br>';
+	}
+
+	public function getNameColumn()
+	{
+		return $this->output->ask('Column name');
+	}
+
+	public function getUnique()
+	{
+		return ($this->output->confirm('Unique?')) ? '->unique()' : '';
+	}
+
+	public function getUnsigned()
+	{
+		return ($this->output->confirm('Unsigned?')) ? '->unsigned()' : '';
+	}
+
+	public function getIndex()
+	{
+		return $this->output->confirm('Index?');
+	}
+
+	public function getDefault()
+	{
+		$default = $this->output->ask('Value default','No');
+		return ($default == 'No') ? 'null' : '\''.$default.'\'';
+	}
+
+	public function getPlaceholder()
+	{
+		$placeholder = $this->output->ask('Placeholder','No');
+		return ($placeholder == 'No') ? '' : ',\'placeholder\' => \''.$placeholder.'\'';
 	}
 }
