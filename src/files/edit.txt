@@ -9,17 +9,17 @@
 
 <body>
 
-    <div class="container">
-        <div class="row">
-            <h1>Update %%TBSINGULAR%%</h1>
-            <div class="col-md-6">
-                {!! Form::model($%%TBSINGULAR%%, array('route' => array('%%TBNAME%%.update', $%%TBSINGULAR%%->id))) !!}
-                    %%FORMINPUTS%%
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                {!! Form::close() !!}
-            </div>
-        </div>
-    </div>
+	<div class="container">
+		<div class="row">
+			<h1>Update %%TBSINGULAR%%</h1>
+			<div class="col-md-6">
+				{!! Form::model($%%TBSINGULAR%%, array('route' => array('%%TBNAME%%.update', $%%TBSINGULAR%%->id))) !!}
+					%%FORMINPUTS%%
+					<button type="submit" class="btn btn-primary">Submit</button>
+				{!! Form::close() !!}
+			</div>
+		</div>
+	</div>
 
 </body>
 

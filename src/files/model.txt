@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class %%MODELNAME%% extends Model
 {
-    protected $table = '%%TBNAME%%';
+	protected $table = '%%TBNAME%%';
 
-    protected $fillable = [%%FILLABLE%%];
+	protected $fillable = [%%FILLABLE%%];
 }
