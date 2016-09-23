@@ -10,65 +10,65 @@ use App\Http\Controllers\Controller;
 
 class %%CNAME%%Controller extends Controller
 {
-    public function index()
-    {
-        $%%TBNAME%% = %%MODELNAME%%::all();
+	public function index()
+	{
+		$%%TBNAME%% = %%MODELNAME%%::all();
 
-        return view('%%TBNAME%%.index')->with('%%TBNAME%%', $%%TBNAME%%);
-    }
+		return view('%%TBNAME%%.index')->with('%%TBNAME%%', $%%TBNAME%%);
+	}
 
-    public function create()
-    {
-        return view('%%TBNAME%%.create');
-    }
+	public function create()
+	{
+		return view('%%TBNAME%%.create');
+	}
 
-    public function store(Request $request)
-    {
-        $inputs = $request->all();
+	public function store(Request $request)
+	{
+		$inputs = $request->all();
 
-        %%MODELNAME%%::create($inputs);
+		%%MODELNAME%%::create($inputs);
 
-        return redirect()->route('%%TBNAME%%.index');
-    }
+		return redirect()->route('%%TBNAME%%.index');
+	}
 
-    public function show($id)
-    {
+	public function show($id)
+	{
 
-    }
+	}
 
-    public function edit($id)
-    {
-        $%%TBSINGULAR%% = %%MODELNAME%%::find($id);
+	public function edit($id)
+	{
+		$%%TBSINGULAR%% = %%MODELNAME%%::find($id);
 
-        if(!$%%TBSINGULAR%%){
-            return redirect()->back();
-        }
+		if(!$%%TBSINGULAR%%){
+			return redirect()->back();
+		}
 
-        return view('%%TBNAME%%.edit')->with('%%TBSINGULAR%%', $%%TBSINGULAR%%);
-    }
+		return view('%%TBNAME%%.edit')->with('%%TBSINGULAR%%', $%%TBSINGULAR%%);
+	}
 
-    public function update(Request $request, $id)
-    {
-        $%%TBSINGULAR%% = %%MODELNAME%%::find($id);
+	public function update(Request $request, $id)
+	{
+		$%%TBSINGULAR%% = %%MODELNAME%%::find($id);
 
-        if(!$%%TBSINGULAR%%){
-            return redirect()->back();
-        }
+		if(!$%%TBSINGULAR%%){
+			return redirect()->back();
+		}
 
-        $inputs = $request->except('_token');
+		$inputs = $request->except('_token');
 
-        $%%TBSINGULAR%%->update($inputs);
+		$%%TBSINGULAR%%->update($inputs);
 
-        return redirect()->route('%%TBNAME%%.index');
+		return redirect()->route('%%TBNAME%%.index');
 
-    }
+	}
 
-    public function delete($id)
-    {
-        $record = %%MODELNAME%%::find($id);
+	public function delete($id)
+	{
+		$record = %%MODELNAME%%::find($id);
 
-        $record->delete();
+		$record->delete();
 
-        return redirect()->route('%%TBNAME%%.index');
-    }
+		return redirect()->route('%%TBNAME%%.index');
+	}
 }
